@@ -1,21 +1,19 @@
 import mongoose from "mongoose";
 import colors from "colors";
+
+mongoose.set('strictQuery', false);
+
 const connectDB = async (app) => {
-  try {
-    const { connection } = await mongoose.connect(process.env.MONGO_URL);
-    console.log(
-      `Connected To Mongodb Database ${connection.host}`.bgMagenta.white
-    );
-    //*: run listen
+  const connection = mongoose.connect(process.env.MONGO_URL).then(({ connection }) => {
+    console.log(`Connected To Mongodb Database ${connection.host} `);
+    //*: Run listen
     app.listen(process.env.PORT, () => {
-      console.log(
-        `Server Running on ${process.env.DEV_MODE} mode on port ${process.env.PORT}`.bgCyan
-          .white
-      );
+      console.log(`Server Running on port ${process.env.PORT} `);
     });
-  } catch (error) {
-    console.error(`Error in Mongodb ${error}`.bgRed.white, error.message);
-  }
+    return connection;
+  }).catch((error) => {
+    console.error('Error in Mongodb:', error.message);
+  })
 };
 
 export default connectDB;
